@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import utils.tsdb as tsdb
 from plugins.base import Plugin
 from state import AppState
+from services.gh import get_repository_names
 
 # -----------
 # -- State --
@@ -91,14 +92,6 @@ def time_til_tomorrow(hour: int = 1):
 
     d = tom - dt
     return d.total_seconds()
-
-def get_repository_names(s: AppState):
-    repos = (
-        s.github
-        .get_organization('Amii-Open-Source')
-        .get_repos(type='public')
-    )
-    return [r.full_name for r in repos]
 
 def get_yesterday_views(s: AppState, name: str):
     views = get_all_views(s, name)
