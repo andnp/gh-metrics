@@ -34,10 +34,12 @@ class Traffic(Plugin):
         self._fill_old()
         while True:
             tom = time_til_tomorrow()
+            print('Logging views in ', tom)
             await asyncio.sleep(tom + 600)
             self._run_once()
 
     def _run_once(self):
+        print('Logging views')
         repo_names = get_repository_names(self._s)
 
         for name in repo_names:
