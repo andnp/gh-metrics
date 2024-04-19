@@ -51,6 +51,7 @@ class Traffic(Plugin):
 
         for name in repo_names:
             v = get_yesterday_views(self._s, name)
+            print(name, v)
             if v is None:
                 continue
 
@@ -59,14 +60,17 @@ class Traffic(Plugin):
     def _fill_old(self):
         ps = self._s.get_plugin('traffic', TrafficState)
         old_data = tsdb.get_all_rows(ps.cur, ps.table_name)
+        print('old_data', len(old_data))
 
         if len(old_data) > 0:
             return
 
+        print('grabbing old data')
         repo_names = get_repository_names(self._s)
         for name in repo_names:
             views = get_all_views(self._s, name)
             for v in views:
+                print(name, v)
                 self._save_view(name, v)
 
     def _save_view(self, name: str, v):
