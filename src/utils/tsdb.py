@@ -19,7 +19,7 @@ def record(
         time = datetime.now()
 
     timestamp = time.isoformat()
-    data = [maybe_quote(timestamp)] + [ maybe_quote(d) for d in data ]
+    data = [timestamp] + data
 
     cols = ['time'] + cols
 
