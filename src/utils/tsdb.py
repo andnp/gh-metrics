@@ -5,6 +5,9 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 
 import utils.config as Config
 
+# -------------
+# -- writers --
+# -------------
 def record(
     cur: Any,
     table_name: str,
@@ -33,6 +36,10 @@ def make_writer(cur: Any, table_name: str, cols: List[str]):
 
     return _writer
 
+
+# --------------
+# -- builders --
+# --------------
 def create_database(
     db_name: str,
 ):
@@ -67,6 +74,9 @@ def create_tsdb_table(
 
     cur.connection.commit()
 
+# -------------
+# -- getters --
+# -------------
 def get_all_tables(cur: Any):
     cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
     return [t[0] for t in cur.fetchall()]
@@ -75,6 +85,9 @@ def get_all_rows(cur: Any, table_name: str):
     cur.execute(f'SELECT * FROM {table_name}')
     return cur.fetchall()
 
+# -----------
+# -- utils --
+# -----------
 def maybe_quote(d: Any):
     if isinstance(d, str):
         return f"'{d}'"
