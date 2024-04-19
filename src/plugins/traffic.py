@@ -1,9 +1,7 @@
 import asyncio
-import psycopg2
 from datetime import datetime, timedelta
 
 import utils.tsdb as tsdb
-import utils.config as Config
 from plugins.base import Plugin
 from state import AppState
 
@@ -12,13 +10,7 @@ from state import AppState
 # -----------
 class TrafficState:
     def __init__(self):
-        user = Config.timescaledb_username()
-        password = Config.timescaledb_password()
-        host = Config.timescaledb_host()
-        port = Config.timescaledb_port()
-
-        conn_url = f'postgres://{user}:{password}@{host}:{port}/gh_metrics'
-        self.con = psycopg2.connect(conn_url)
+        self.con = tsdb.connect('gh_metrics')
         self.cur = self.con.cursor()
 
         self.cols = [
