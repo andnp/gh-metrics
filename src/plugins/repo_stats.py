@@ -46,10 +46,12 @@ class RepoStatsPlugin(Plugin):
 
         for name in repo_names:
             stats = get_repo_stats(self._s, name)
-            print(name, 'stats', stats)
+
+            sub_name = name.split('/')[-1]
+            print(sub_name, 'stats', stats)
 
             ps.write([
-                name,
+                sub_name,
                 stats.stars,
                 stats.watchers,
                 stats.forks,
