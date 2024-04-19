@@ -37,29 +37,9 @@ class Traffic(Plugin):
             tom = time_til_tomorrow()
             print('Logging views in ', tom)
             await asyncio.sleep(tom + 600)
-            self._run_once()
-
-    def _run_once(self):
-        print('Logging views')
-        repo_names = get_repository_names(self._s)
-
-        for name in repo_names:
-            v = get_yesterday_views(self._s, name)
-            print(name, v)
-            if v is None:
-                continue
-
-            self._save_view(name, v)
+            self._fill_old()
 
     def _fill_old(self):
-        ps = self._s.get_plugin('traffic', TrafficState)
-        old_data = tsdb.get_all_rows(ps.cur, ps.table_name)
-        print('old_data', len(old_data))
-
-        if len(old_data) > 0:
-            return
-
-        print('grabbing old data')
         repo_names = get_repository_names(self._s)
         for name in repo_names:
             views = get_all_views(self._s, name)
@@ -71,8 +51,22 @@ class Traffic(Plugin):
         ps = self._s.get_plugin('traffic', TrafficState)
 
         sub_name = name.split('/')[-1]
-        ps.write([sub_name, v.uniques, v.count], time=v.timestamp)
 
+        row = [sub_name, v.uniques, v.count]
+        already_exists = tsdb.row_exists(
+            ps.cur,
+            ps.table_name,
+            ['repo'],
+            [sub_name],
+            timestamp=v.timestamp,
+            time_fuzz='10 hours',
+        )
+
+        if already_exists:
+            print('Row already exists', v.timestamp, row)
+            return
+
+        ps.write(row, time=v.timestamp)
 
     @staticmethod
     def setup(s: AppState):
