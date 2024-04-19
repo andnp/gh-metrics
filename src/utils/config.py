@@ -19,3 +19,19 @@ def _get_config():
 def github_token() -> str:
     c = _get_config()
     return c['github_token']
+
+def timescaledb_host() -> str:
+    c = _get_config()
+    return c['timescaledb']['host']
+
+def timescaledb_port() -> str:
+    c = _get_config()
+    return c['timescaledb']['port']
+
+def timescaledb_username() -> str:
+    c = _get_config()
+    return c['timescaledb']['username']
+
+def timescaledb_password() -> str:
+    c = _get_config()
+    return c['timescaledb']['password']

@@ -1,3 +1,30 @@
 services:
   app:
     build: .
+
+    depends_on:
+      - timescaledb
+      - grafana
+
+  timescaledb:
+    image: timescale/timescaledb:latest-pg15
+    restart: always
+    environment:
+      POSTGRES_USER: timescaledb
+      POSTGRES_PASSWORD: password
+    volumes:
+      - ./timescaledb:/var/lib/postgresql/data
+
+  grafana:
+    container_name: grafana
+    image: grafana/grafana-oss
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+
+    volumes:
+      - ./grafana:/var/lib/grafana
+      - ./grafana.ini:/etc/grafana/grafana.ini
+
+    environment:
+      - GF_PATHS_CONFIG=/etc/grafana/grafana.ini

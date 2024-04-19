@@ -1,2 +1,7 @@
 .venv/
 secrets.json
+data/
+config/
+grafana/
+timescaledb/
+**/__pycache__
