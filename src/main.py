@@ -4,6 +4,7 @@ from github import Auth
 
 from plugins.traffic import Traffic
 from state import AppState
+import utils.tsdb as tsdb
 import utils.config as Config
 
 async def run():
@@ -13,6 +14,8 @@ async def run():
     auth = Auth.Token(token)
 
     g = Github(auth=auth)
+
+    tsdb.create_database('gh_metrics')
 
     state = AppState(g)
     traffic = Traffic.setup(state)

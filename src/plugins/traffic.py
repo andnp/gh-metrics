@@ -17,8 +17,6 @@ class TrafficState:
         host = Config.timescaledb_host()
         port = Config.timescaledb_port()
 
-        tsdb.create_database('gh_metrics')
-
         conn_url = f'postgres://{user}:{password}@{host}:{port}/gh_metrics'
         self.con = psycopg2.connect(conn_url)
         self.cur = self.con.cursor()
