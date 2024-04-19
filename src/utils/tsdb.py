@@ -19,7 +19,7 @@ def record(
         time = datetime.now()
 
     timestamp = time.isoformat()
-    data = [maybe_quote(timestamp)] + [ maybe_quote(d) for d in data ]
+    data = [timestamp] + data
 
     cols = ['time'] + cols
 
@@ -94,6 +94,30 @@ def get_all_rows(cur: Any, table_name: str):
     cur.execute(f'SELECT * FROM {table_name}')
     return cur.fetchall()
 
+def row_exists(
+    cur: Any,
+    table_name: str,
+    cols: List[str],
+    data: List[Any],
+    timestamp: datetime | None = None,
+    time_fuzz: str | None = None,
+):
+    cond = make_cond(cols)
+
+    if timestamp is not None and time_fuzz is None:
+        cond += f" AND time=timestamp '{timestamp}'"
+    elif timestamp is not None and time_fuzz is not None:
+        cond += f" AND time BETWEEN (timestamp '{timestamp}' - interval '{time_fuzz}') AND (timestamp '{timestamp}' + interval '{time_fuzz}')"
+
+    query = f'SELECT * FROM {table_name} WHERE {cond}'
+    cur.execute(query, data)
+    rows = cur.fetchall()
+
+    if len(rows) > 1:
+        print('WARNING: more than one row exists', table_name, data)
+
+    return len(rows) > 0
+
 # -----------
 # -- utils --
 # -----------
@@ -102,3 +126,11 @@ def maybe_quote(d: Any):
         return f"'{d}'"
 
     return d
+
+def make_cond(cols: List[str]):
+    parts = []
+    for c in cols:
+        p = f'{c}=%s'
+        parts.append(p)
+
+    return ' AND '.join(parts)
