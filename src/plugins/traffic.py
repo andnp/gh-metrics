@@ -19,8 +19,9 @@ class TrafficState:
             'unique_views INTEGER',
             'total_views INTEGER',
         ]
+        self.col_names = [c.split(' ')[0] for c in self.cols]
         self.table_name = 'gh_traffic'
-        self.write = tsdb.make_writer(self.cur, self.table_name, ['repo', 'unique_views', 'total_views'])
+        self.write = tsdb.make_writer(self.cur, self.table_name, self.col_names)
 
 # ------------
 # -- Plugin --
