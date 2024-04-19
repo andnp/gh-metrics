@@ -3,6 +3,8 @@ from github import Github
 from github import Auth
 
 from plugins.traffic import Traffic
+from plugins.repo_stats import RepoStatsPlugin
+
 from state import AppState
 import utils.tsdb as tsdb
 import utils.config as Config
@@ -19,9 +21,11 @@ async def run():
 
     state = AppState(g)
     traffic = Traffic.setup(state)
+    repo_stats = RepoStatsPlugin.setup(state)
 
     await asyncio.gather(
         traffic.run(),
+        repo_stats.run(),
     )
 
     g.close()
