@@ -1,7 +1,8 @@
-from datetime import datetime
 import psycopg2
+from datetime import datetime
 from typing import Any, List
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
+from psycopg2._psycopg import cursor
 
 import utils.config as Config
 
@@ -9,7 +10,7 @@ import utils.config as Config
 # -- writers --
 # -------------
 def record(
-    cur: Any,
+    cur: cursor,
     table_name: str,
     cols: List[str],
     data: List[Any],
@@ -30,7 +31,7 @@ def record(
     cur.execute(query, data)
     cur.connection.commit()
 
-def make_writer(cur: Any, table_name: str, cols: List[str]):
+def make_writer(cur: cursor, table_name: str, cols: List[str]):
     def _writer(data: List[Any], time: datetime | None = None):
         return record(cur, table_name, cols, data, time=time)
 
@@ -54,7 +55,7 @@ def create_database(
         print(e)
 
 def create_tsdb_table(
-    cur: Any,
+    cur: cursor,
     table_name: str,
     cols: List[str],
 ):
@@ -86,16 +87,16 @@ def connect(db_name: str | None = None):
 # -------------
 # -- getters --
 # -------------
-def get_all_tables(cur: Any):
+def get_all_tables(cur: cursor):
     cur.execute("SELECT table_name FROM information_schema.tables WHERE table_schema = 'public';")
     return [t[0] for t in cur.fetchall()]
 
-def get_all_rows(cur: Any, table_name: str):
+def get_all_rows(cur: cursor, table_name: str):
     cur.execute(f'SELECT * FROM {table_name}')
     return cur.fetchall()
 
 def row_exists(
-    cur: Any,
+    cur: cursor,
     table_name: str,
     cols: List[str],
     data: List[Any],
