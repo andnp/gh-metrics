@@ -1,4 +1,4 @@
-import json
+import tomllib
 from typing import Any
 
 _config: Any = None
@@ -9,8 +9,8 @@ def _get_config():
     if _config is not None:
         return _config
 
-    with open('secrets.json', 'r') as f:
-        c = json.load(f)
+    with open('config.toml', 'rb') as f:
+        c = tomllib.load(f)
 
     _config = c
     return c
