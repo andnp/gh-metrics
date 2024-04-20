@@ -13,7 +13,7 @@ async def run():
     await asyncio.sleep(25)
 
     config = get_config()
-    auth = Auth.Token(config.github_token)
+    auth = Auth.Token(config.github.token)
 
     g = Github(auth=auth)
 

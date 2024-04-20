@@ -2,6 +2,11 @@ from dataclasses import dataclass
 import tomllib
 
 @dataclass
+class GithubConfig:
+    token: str
+    organization: str
+
+@dataclass
 class TSDBConfig:
     host: str
     port: int
@@ -10,7 +15,7 @@ class TSDBConfig:
 
 @dataclass
 class Config:
-    github_token: str
+    github: GithubConfig
     timescaledb: TSDBConfig
 
 def get_config():
@@ -18,7 +23,10 @@ def get_config():
         c = tomllib.load(f)
 
     conf = Config(
-        github_token=c['github_token'],
+        github=GithubConfig(
+            token=c['github']['token'],
+            organization=c['github']['organization'],
+        ),
         timescaledb=TSDBConfig(
             host=c['timescaledb']['host'],
             port=c['timescaledb']['port'],
