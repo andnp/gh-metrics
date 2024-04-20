@@ -11,9 +11,6 @@ from services.gh import get_repository_names
 # -----------
 class TrafficState:
     def __init__(self):
-        self.con = tsdb.connect('gh_metrics')
-        self.cur = self.con.cursor()
-
         self.cols = [
             'repo TEXT',
             'unique_views INTEGER',
@@ -21,7 +18,6 @@ class TrafficState:
         ]
         self.col_names = [c.split(' ')[0] for c in self.cols]
         self.table_name = 'gh_traffic'
-        self.write = tsdb.make_writer(self.cur, self.table_name, self.col_names)
 
 # ------------
 # -- Plugin --
@@ -30,6 +26,8 @@ class Traffic(Plugin):
     def __init__(self, app_state: AppState):
         super().__init__()
         self._s = app_state
+        ps = self._s.get_plugin('traffic', TrafficState)
+        self.write = tsdb.make_writer(self._s.cur, ps.table_name, ps.col_names)
 
     async def run(self):
         self._fill_old()
@@ -54,7 +52,7 @@ class Traffic(Plugin):
 
         row = [sub_name, v.uniques, v.count]
         already_exists = tsdb.row_exists(
-            ps.cur,
+            self._s.cur,
             ps.table_name,
             ['repo'],
             [sub_name],
@@ -66,16 +64,16 @@ class Traffic(Plugin):
             print('Row already exists', v.timestamp, row)
             return
 
-        ps.write(row, time=v.timestamp)
+        self.write(row, time=v.timestamp)
 
     @staticmethod
     def setup(s: AppState):
         ps = TrafficState()
         s.plugins['traffic'] = ps
 
-        tables = tsdb.get_all_tables(ps.cur)
+        tables = tsdb.get_all_tables(s.cur)
         if ps.table_name not in tables:
-            tsdb.create_tsdb_table(ps.cur, ps.table_name, ps.cols)
+            tsdb.create_tsdb_table(s.cur, ps.table_name, ps.cols)
 
         return Traffic(s)
 

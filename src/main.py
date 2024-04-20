@@ -6,20 +6,21 @@ from plugins.traffic import Traffic
 from plugins.repo_stats import RepoStatsPlugin
 
 from state import AppState
+from utils.config import get_config
 import utils.tsdb as tsdb
-import utils.config as Config
 
 async def run():
     await asyncio.sleep(25)
 
-    token = Config.github_token()
-    auth = Auth.Token(token)
+    config = get_config()
+    auth = Auth.Token(config.github_token)
 
     g = Github(auth=auth)
 
-    tsdb.create_database('gh_metrics')
+    tsdb.create_database(config, 'gh_metrics')
+    con = tsdb.connect(config, 'gh_metrics')
 
-    state = AppState(g)
+    state = AppState(config, con, g)
     traffic = Traffic.setup(state)
     repo_stats = RepoStatsPlugin.setup(state)
 

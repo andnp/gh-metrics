@@ -4,7 +4,7 @@ from typing import Any, List
 from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2._psycopg import cursor
 
-import utils.config as Config
+from utils.config import Config
 
 # -------------
 # -- writers --
@@ -42,9 +42,10 @@ def make_writer(cur: cursor, table_name: str, cols: List[str]):
 # -- builders --
 # --------------
 def create_database(
+    config: Config,
     db_name: str,
 ):
-    con = connect()
+    con = connect(config)
     con.set_isolation_level(ISOLATION_LEVEL_AUTOCOMMIT)
     cur = con.cursor()
 
@@ -70,18 +71,14 @@ def create_tsdb_table(
 
     cur.connection.commit()
 
-def connect(db_name: str | None = None):
+def connect(config: Config, db_name: str | None = None):
     if db_name is None:
         db_name = ''
     else:
         db_name = '/' + db_name
 
-    user = Config.timescaledb_username()
-    host = Config.timescaledb_host()
-    password = Config.timescaledb_password()
-    port = Config.timescaledb_port()
-
-    con = psycopg2.connect(f'postgres://{user}:{password}@{host}:{port}{db_name}')
+    c = config.timescaledb
+    con = psycopg2.connect(f'postgres://{c.username}:{c.password}@{c.host}:{c.port}{db_name}')
     return con
 
 # -------------

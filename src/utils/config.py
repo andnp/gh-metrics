@@ -1,37 +1,29 @@
+from dataclasses import dataclass
 import tomllib
-from typing import Any
 
-_config: Any = None
+@dataclass
+class TSDBConfig:
+    host: str
+    port: int
+    username: str
+    password: str
 
-def _get_config():
-    global _config
+@dataclass
+class Config:
+    github_token: str
+    timescaledb: TSDBConfig
 
-    if _config is not None:
-        return _config
-
+def get_config():
     with open('config.toml', 'rb') as f:
         c = tomllib.load(f)
 
-    _config = c
-    return c
-
-
-def github_token() -> str:
-    c = _get_config()
-    return c['github_token']
-
-def timescaledb_host() -> str:
-    c = _get_config()
-    return c['timescaledb']['host']
-
-def timescaledb_port() -> str:
-    c = _get_config()
-    return c['timescaledb']['port']
-
-def timescaledb_username() -> str:
-    c = _get_config()
-    return c['timescaledb']['username']
-
-def timescaledb_password() -> str:
-    c = _get_config()
-    return c['timescaledb']['password']
+    conf = Config(
+        github_token=c['github_token'],
+        timescaledb=TSDBConfig(
+            host=c['timescaledb']['host'],
+            port=c['timescaledb']['port'],
+            username=c['timescaledb']['username'],
+            password=c['timescaledb']['password'],
+        ),
+    )
+    return conf
