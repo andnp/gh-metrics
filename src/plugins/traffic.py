@@ -51,6 +51,22 @@ class Traffic(Plugin):
 
         sub_name = name.split('/')[-1]
 
+        row_exists = tsdb.row_exists(
+            self._s.cur,
+            ps.table_name,
+            cols=['repo'],
+            data=[sub_name],
+            timestamp=v.timestamp,
+            time_fuzz='10 hours',
+        )
+
+        if not row_exists:
+            print('Adding row', name, v)
+            return self.write(
+                [sub_name, v.uniques, v.count],
+                v.timestamp,
+            )
+
         modified_rows = tsdb.modify_row(
             self._s.cur,
             ps.table_name,
