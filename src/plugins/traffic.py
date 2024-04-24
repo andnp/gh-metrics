@@ -50,21 +50,19 @@ class Traffic(Plugin):
 
         sub_name = name.split('/')[-1]
 
-        row = [sub_name, v.uniques, v.count]
-        already_exists = tsdb.row_exists(
+        modified_rows = tsdb.modify_row(
             self._s.cur,
             ps.table_name,
-            ['repo'],
-            [sub_name],
+            id_cols=['repo'],
+            id_values=[sub_name],
+            mod_cols=['unique_views', 'total_views'],
+            mod_values=[v.uniques, v.count],
             timestamp=v.timestamp,
             time_fuzz='10 hours',
         )
 
-        if already_exists:
-            print('Row already exists', v.timestamp, row)
-            return
-
-        self.write(row, time=v.timestamp)
+        if len(modified_rows) > 1:
+            print(f'WARNING: found multiple rows {sub_name} {v.timestamp}')
 
     @staticmethod
     def setup(s: AppState):

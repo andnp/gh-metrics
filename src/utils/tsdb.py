@@ -129,6 +129,35 @@ def get_rows(
 
     return rows
 
+# -------------
+# -- setters --
+# -------------
+def modify_row(
+    cur: cursor,
+    table_name: str,
+    id_cols: List[str],
+    id_values: List[Any],
+    mod_cols: List[str],
+    mod_values: List[Any],
+    timestamp: datetime | None = None,
+    time_fuzz: str | None = None,
+):
+    cond = make_cond_with_time(
+        id_cols,
+        timestamp,
+        time_fuzz,
+    )
+
+    updates = ','.join([
+        f'{col} = %s'
+        for col in mod_cols
+    ])
+
+    query = f'UPDATE {table_name} SET {updates} WHERE {cond} RETURNING *;'
+    cur.execute(query, mod_values + id_values)
+    rows = cur.fetchall()
+    return rows
+
 # -----------
 # -- utils --
 # -----------
