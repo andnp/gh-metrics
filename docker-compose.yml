@@ -3,6 +3,9 @@ services:
     container_name: gh-metrics
     build: .
 
+    volumes:
+      - ./config.toml:/config.toml
+
     depends_on:
       - timescaledb
       - grafana
