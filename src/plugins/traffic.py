@@ -86,18 +86,6 @@ def time_til_tomorrow(hour: int = 1):
     d = tom - dt
     return d.total_seconds()
 
-def get_yesterday_views(s: AppState, name: str):
-    views = get_all_views(s, name)
-    today = datetime.now()
-    for v in views:
-        timestamp = v.timestamp.replace(tzinfo=None)
-        d = today - timestamp
-
-        if d.days == 1:
-            return v
-
-    return
-
 def get_all_views(s: AppState, name: str):
     r = s.github.get_repo(name, lazy=True)
 
