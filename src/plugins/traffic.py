@@ -5,6 +5,7 @@ import utils.tsdb as tsdb
 from plugins.base import Plugin
 from state import AppState
 from services.gh import get_repository_names
+from github.View import View
 
 # -----------
 # -- State --
@@ -45,7 +46,7 @@ class Traffic(Plugin):
                 print(name, v)
                 self._save_view(name, v)
 
-    def _save_view(self, name: str, v):
+    def _save_view(self, name: str, v: View):
         ps = self._s.get_plugin('traffic', TrafficState)
 
         sub_name = name.split('/')[-1]
