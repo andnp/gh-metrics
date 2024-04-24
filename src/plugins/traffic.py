@@ -1,5 +1,7 @@
 import asyncio
+from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Any, List
 
 import utils.tsdb as tsdb
 from plugins.base import Plugin
@@ -115,5 +117,33 @@ def get_all_views(s: AppState, name: str):
 
     views = traffic_data['views']
     assert isinstance(views, list)
+    if len(views) == 0:
+        return views
 
-    return views
+    views = sorted(views, key=lambda v: v.timestamp)
+    all_views: List[View] = []
+    last_time = views[0].timestamp
+    for v in views:
+        all_views.append(v)
+
+        d = v.timestamp - last_time
+        if d.days < 2:
+            continue
+
+        for i in range(1, d.days - 1, 1):
+            view: Any = MyView(
+                timestamp=v.timestamp - timedelta(days=i),
+                count=0,
+                uniques=0,
+            )
+            all_views.append(view)
+
+        last_time = v.timestamp
+
+    return all_views
+
+@dataclass
+class MyView:
+    timestamp: datetime
+    count: int
+    uniques: int
