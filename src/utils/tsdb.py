@@ -100,16 +100,14 @@ def row_exists(
     timestamp: datetime | None = None,
     time_fuzz: str | None = None,
 ):
-    cond = make_cond(cols)
-
-    if timestamp is not None and time_fuzz is None:
-        cond += f" AND time=timestamp '{timestamp}'"
-    elif timestamp is not None and time_fuzz is not None:
-        cond += f" AND time BETWEEN (timestamp '{timestamp}' - interval '{time_fuzz}') AND (timestamp '{timestamp}' + interval '{time_fuzz}')"
-
-    query = f'SELECT * FROM {table_name} WHERE {cond}'
-    cur.execute(query, data)
-    rows = cur.fetchall()
+    rows = get_rows(
+        cur=cur,
+        table_name=table_name,
+        cols=cols,
+        data=data,
+        timestamp=timestamp,
+        time_fuzz=time_fuzz,
+    )
 
     if len(rows) > 1:
         print('WARNING: more than one row exists', table_name, data)
