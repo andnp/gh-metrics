@@ -12,17 +12,18 @@ services:
 
   timescaledb:
     container_name: timescaledb
-    image: timescale/timescaledb:latest-pg15
+    image: docker.io/timescale/timescaledb:latest-pg15
     restart: always
     environment:
       POSTGRES_USER: timescaledb
       POSTGRES_PASSWORD: password
+
     volumes:
       - ./timescaledb:/var/lib/postgresql/data
 
   grafana:
     container_name: grafana
-    image: grafana/grafana-oss
+    image: docker.io/grafana/grafana-oss
     restart: unless-stopped
     ports:
       - 3003:3000
