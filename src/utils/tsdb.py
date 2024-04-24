@@ -116,6 +116,21 @@ def row_exists(
 
     return len(rows) > 0
 
+def get_rows(
+    cur: cursor,
+    table_name: str,
+    cols: List[str],
+    data: List[Any],
+    timestamp: datetime | None = None,
+    time_fuzz: str | None = None,
+):
+    cond = make_cond_with_time(cols, timestamp, time_fuzz)
+    query = f'SELECT * FROM {table_name} WHERE {cond}'
+    cur.execute(query, data)
+    rows = cur.fetchall()
+
+    return rows
+
 # -----------
 # -- utils --
 # -----------
@@ -132,3 +147,17 @@ def make_cond(cols: List[str]):
         parts.append(p)
 
     return ' AND '.join(parts)
+
+def make_cond_with_time(
+    cols: List[str],
+    timestamp: datetime | None = None,
+    time_fuzz: str | None = None,
+):
+    cond = make_cond(cols)
+
+    if timestamp is not None and time_fuzz is None:
+        cond += f" AND time=timestamp '{timestamp}'"
+    elif timestamp is not None and time_fuzz is not None:
+        cond += f" AND time BETWEEN (timestamp '{timestamp}' - interval '{time_fuzz}') AND (timestamp '{timestamp}' + interval '{time_fuzz}')"
+
+    return cond
