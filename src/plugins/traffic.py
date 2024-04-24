@@ -35,9 +35,9 @@ class Traffic(Plugin):
     async def run(self):
         self._fill_old()
         while True:
-            tom = time_til_tomorrow()
-            print('Logging views in ', tom)
-            await asyncio.sleep(tom + 600)
+            print('Logging views.')
+            h = self._s.config.traffic.update_interval
+            await asyncio.sleep(h * 60 * 60)
             self._fill_old()
 
     def _fill_old(self):
@@ -97,14 +97,6 @@ class Traffic(Plugin):
 # -----------
 # -- utils --
 # -----------
-def time_til_tomorrow(hour: int = 1):
-    dt = datetime.now()
-    tom = dt + timedelta(days=1)
-    tom = tom.replace(hour=hour, minute=0, second=0)
-
-    d = tom - dt
-    return d.total_seconds()
-
 def get_all_views(s: AppState, name: str):
     r = s.github.get_repo(name, lazy=True)
 

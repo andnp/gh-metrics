@@ -2,6 +2,10 @@ from dataclasses import dataclass
 import tomllib
 
 @dataclass
+class TrafficConfig:
+    update_interval: int
+
+@dataclass
 class GithubConfig:
     token: str
     organization: str
@@ -15,6 +19,7 @@ class TSDBConfig:
 
 @dataclass
 class Config:
+    traffic: TrafficConfig
     github: GithubConfig
     timescaledb: TSDBConfig
 
@@ -23,6 +28,9 @@ def get_config():
         c = tomllib.load(f)
 
     conf = Config(
+        traffic=TrafficConfig(
+            update_interval=c['traffic']['update_interval'],
+        ),
         github=GithubConfig(
             token=c['github']['token'],
             organization=c['github']['organization'],
