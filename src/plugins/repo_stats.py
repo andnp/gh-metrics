@@ -4,6 +4,7 @@ import utils.tsdb as tsdb
 from plugins.base import Plugin
 from state import AppState
 from services.gh import get_repository_names, get_repo_stats
+from utils.logger import logger
 
 # -----------
 # -- State --
@@ -41,12 +42,13 @@ class RepoStatsPlugin(Plugin):
             self._run_once()
 
     def _run_once(self):
+        logger.info('Getting repository stats')
         repo_names = get_repository_names(self._s)
         for name in repo_names:
             stats = get_repo_stats(self._s, name)
 
             sub_name = name.split('/')[-1]
-            print(sub_name, 'stats', stats)
+            logger.info(f'Obtained stats for <{sub_name}> - {stats}')
 
             self.write([
                 sub_name,

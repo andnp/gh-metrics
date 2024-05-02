@@ -8,6 +8,7 @@ from plugins.base import Plugin
 from state import AppState
 from services.gh import get_repository_names
 from github.View import View
+from utils.logger import logger
 
 # -----------
 # -- State --
@@ -35,7 +36,7 @@ class Traffic(Plugin):
     async def run(self):
         self._fill_old()
         while True:
-            print('Logging views.')
+            logger.info('Logging views.')
             h = self._s.config.traffic.update_interval
             await asyncio.sleep(h * 60 * 60)
             self._fill_old()
@@ -45,7 +46,7 @@ class Traffic(Plugin):
         for name in repo_names:
             views = get_all_views(self._s, name)
             for v in views:
-                print(name, v)
+                logger.info(f'{name} - {v}')
                 self._save_view(name, v)
 
     def _save_view(self, name: str, v: View):
@@ -63,7 +64,7 @@ class Traffic(Plugin):
         )
 
         if not row_exists:
-            print('Adding row', name, v)
+            logger.info(f'Adding row: {name} - {v}')
             return self.write(
                 [sub_name, v.uniques, v.count],
                 v.timestamp,
@@ -81,7 +82,7 @@ class Traffic(Plugin):
         )
 
         if len(modified_rows) > 1:
-            print(f'WARNING: found multiple rows {sub_name} {v.timestamp}')
+            logger.warn(f'Found multiple rows {sub_name} {v.timestamp}')
 
     @staticmethod
     def setup(s: AppState):
