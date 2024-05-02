@@ -25,8 +25,8 @@ async def run():
     repo_stats = RepoStatsPlugin.setup(state)
 
     await asyncio.gather(
-        traffic.run(),
-        repo_stats.run(),
+        traffic.run_forever(),
+        repo_stats.run_forever(),
     )
 
     g.close()
