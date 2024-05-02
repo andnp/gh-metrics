@@ -29,7 +29,7 @@ def record(
     cols_str = ','.join(cols)
 
     query = f'INSERT INTO {table_name} ({cols_str}) VALUES ({data_str});'
-    logger.debug(query)
+    logger.debug(f'{query} - {data}')
     cur.execute(query, data)
     cur.connection.commit()
 
