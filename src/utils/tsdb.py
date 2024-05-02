@@ -5,6 +5,7 @@ from psycopg2.extensions import ISOLATION_LEVEL_AUTOCOMMIT
 from psycopg2._psycopg import cursor
 
 from utils.config import Config
+from utils.logger import logger
 
 # -------------
 # -- writers --
@@ -28,6 +29,7 @@ def record(
     cols_str = ','.join(cols)
 
     query = f'INSERT INTO {table_name} ({cols_str}) VALUES ({data_str});'
+    logger.debug(query)
     cur.execute(query, data)
     cur.connection.commit()
 
